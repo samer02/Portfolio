@@ -5,6 +5,8 @@ import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Card, CardContent } from "@/components/ui/card";
 import { useToast } from "@/hooks/use-toast";
+import { supabase } from "@/integrations/supabase/client";
+import { useState } from "react";
 
 const Contact = () => {
   const { ref, inView } = useInView({
@@ -13,13 +15,43 @@ const Contact = () => {
   });
 
   const { toast } = useToast();
+  const [isLoading, setIsLoading] = useState(false);
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    toast({
-      title: "Message Sent!",
-      description: "Thank you for reaching out. I'll get back to you soon.",
-    });
+    setIsLoading(true);
+
+    const formData = new FormData(e.currentTarget);
+    const data = {
+      name: formData.get("name") as string,
+      email: formData.get("email") as string,
+      subject: formData.get("subject") as string,
+      message: formData.get("message") as string,
+    };
+
+    try {
+      const { error } = await supabase.functions.invoke("send-contact-email", {
+        body: data,
+      });
+
+      if (error) throw error;
+
+      toast({
+        title: "Message envoyé !",
+        description: "Merci de m'avoir contacté. Je vous répondrai bientôt.",
+      });
+
+      e.currentTarget.reset();
+    } catch (error: any) {
+      console.error("Error sending message:", error);
+      toast({
+        title: "Erreur",
+        description: "Une erreur s'est produite. Veuillez réessayer.",
+        variant: "destructive",
+      });
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   const contactInfo = [
@@ -131,6 +163,7 @@ const Contact = () => {
                     </label>
                     <Input
                       id="name"
+                      name="name"
                       placeholder="Your name"
                       required
                       className="border-border focus:border-primary"
@@ -142,6 +175,7 @@ const Contact = () => {
                     </label>
                     <Input
                       id="email"
+                      name="email"
                       type="email"
                       placeholder="your.email@example.com"
                       required
@@ -154,6 +188,7 @@ const Contact = () => {
                     </label>
                     <Input
                       id="subject"
+                      name="subject"
                       placeholder="What's this about?"
                       required
                       className="border-border focus:border-primary"
@@ -165,6 +200,7 @@ const Contact = () => {
                     </label>
                     <Textarea
                       id="message"
+                      name="message"
                       placeholder="Tell me more about your project or inquiry..."
                       rows={6}
                       required
@@ -174,10 +210,11 @@ const Contact = () => {
                   <Button
                     type="submit"
                     size="lg"
+                    disabled={isLoading}
                     className="w-full bg-primary hover:bg-primary/90 shadow-glow-primary"
                   >
                     <Send className="mr-2 h-5 w-5" />
-                    Send Message
+                    {isLoading ? "Envoi en cours..." : "Send Message"}
                   </Button>
                 </form>
               </CardContent>

@@ -21,7 +21,7 @@ const Contact = () => {
     e.preventDefault();
     setIsLoading(true);
 
-    // ✅ Sauvegarde la référence du formulaire avant le await
+    // ✅ Capture form reference before awaiting
     const form = e.currentTarget;
     const formData = new FormData(form);
 
@@ -40,17 +40,17 @@ const Contact = () => {
       if (error) throw error;
 
       toast({
-        title: "Message envoyé !",
-        description: "Merci de m'avoir contacté. Je vous répondrai bientôt.",
+        title: "Message sent!",
+        description: "Thank you for reaching out. I'll get back to you soon.",
       });
 
-      // ✅ Reset du formulaire après succès
+      // ✅ Reset form safely after success
       form?.reset();
     } catch (error: any) {
       console.error("Error sending message:", error);
       toast({
-        title: "Erreur",
-        description: "Une erreur s'est produite. Veuillez réessayer.",
+        title: "Error",
+        description: "Something went wrong. Please try again.",
         variant: "destructive",
       });
     } finally {
@@ -110,7 +110,7 @@ const Contact = () => {
               </span>
             </h2>
             <p className="text-muted-foreground max-w-2xl mx-auto text-lg">
-              Let's discuss your next project or opportunity
+              Let's talk about your next project or collaboration opportunity
             </p>
           </div>
 
@@ -225,7 +225,7 @@ const Contact = () => {
                     className="w-full bg-primary hover:bg-primary/90 shadow-glow-primary"
                   >
                     <Send className="mr-2 h-5 w-5" />
-                    {isLoading ? "Envoi en cours..." : "Send Message"}
+                    {isLoading ? "Sending..." : "Send Message"}
                   </Button>
                 </form>
               </CardContent>

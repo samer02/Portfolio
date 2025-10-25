@@ -21,7 +21,10 @@ const Contact = () => {
     e.preventDefault();
     setIsLoading(true);
 
-    const formData = new FormData(e.currentTarget);
+    // ✅ Sauvegarde la référence du formulaire avant le await
+    const form = e.currentTarget;
+    const formData = new FormData(form);
+
     const data = {
       name: formData.get("name") as string,
       email: formData.get("email") as string,
@@ -41,7 +44,8 @@ const Contact = () => {
         description: "Merci de m'avoir contacté. Je vous répondrai bientôt.",
       });
 
-      e.currentTarget.reset();
+      // ✅ Reset du formulaire après succès
+      form?.reset();
     } catch (error: any) {
       console.error("Error sending message:", error);
       toast({
@@ -93,10 +97,17 @@ const Contact = () => {
   return (
     <section id="contact" className="py-20 bg-muted/30" ref={ref}>
       <div className="container mx-auto px-4">
-        <div className={`space-y-12 ${inView ? "animate-fade-in-up" : "opacity-0"}`}>
+        <div
+          className={`space-y-12 ${
+            inView ? "animate-fade-in-up" : "opacity-0"
+          }`}
+        >
           <div className="text-center space-y-4">
             <h2 className="text-4xl md:text-5xl font-bold">
-              Get In <span className="bg-gradient-primary bg-clip-text text-transparent">Touch</span>
+              Get In{" "}
+              <span className="bg-gradient-primary bg-clip-text text-transparent">
+                Touch
+              </span>
             </h2>
             <p className="text-muted-foreground max-w-2xl mx-auto text-lg">
               Let's discuss your next project or opportunity
